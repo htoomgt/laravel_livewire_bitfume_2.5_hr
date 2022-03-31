@@ -25,4 +25,4 @@
 
 
 ## Refernce
-1. Main reference (link)[https://www.youtube.com/watch?v=HWTF-oi70e4]
+1. Main reference [link](https://www.youtube.com/watch?v=HWTF-oi70e4)
