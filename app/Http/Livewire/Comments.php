@@ -2,25 +2,79 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Comment;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\WithPagination;
+use Illuminate\Support\Str;
+use Intervention\Image\ImageManagerStatic;
 
 class Comments extends Component
 {
-    public $comments = [
-        [
-            'id' => 1,
-            'body' => 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aperiam consequuntur laudantium voluptatibus blanditiis exercitationem, repudiandae, consequatur facilis sint in non magni veritatis cupiditate enim tempore minima alias recusandae nam nulla.',
-            'created_at' => '3 min ago',
-            'creator' => 'Htoo Maung Thait',
-            'image' => ''
-        ]
-    ];
+    use WithPagination;
 
+    public $newComment;
     public $image = "";
+    public $ticketId;
+    
+    
+    public function ticketSelected($ticketId)
+    {
+        $this->ticketId = $ticketId;
+    }
 
+    public function handleFileUpload($imageData)
+    {
+        $this->image = $imageData;
+    }
+
+    public function updated($field)
+    {
+        $this->validateOnly($field, ['newComment' => 'required|max:255']);
+    }
+
+    public function addComment()
+    {
+        $this->validate(['newComment' => 'required|max:255']);
+        $image = "";
+
+        $createdComment = Comment::create([
+            'body'              => $this->newComment, 
+            'user_id' => 1,
+            'image'             => $image,
+            'support_ticket_id' => $this->ticketId,
+        ]);        
+
+        $this->newComment = '';
+        $this->image      = '';
+        session()->flash('message', 'Comment added successfully 😁');
+
+    }
+
+    public function storeImage()
+    {
+        if (!$this->image) {
+            return null;
+        }
+
+        $img   = ImageManagerStatic::make($this->image)->encode('jpg');
+        $name  = Str::random() . '.jpg';
+        Storage::disk('public')->put($name, $img);
+        return $name;
+    }
+
+    public function remove($commentId)
+    {
+        $comment = Comment::find($commentId);
+        Storage::disk('public')->delete($comment->image);
+        $comment->delete();
+        session()->flash('message', 'Comment deleted successfully 😊');
+    }
 
     public function render()
     {
-        return view('livewire.comments');
+        return view('livewire.comments', [
+            'comments' => Comment::where('support_ticket_id', $this->ticketId)->latest()->paginate(3),
+        ]);
     }
 }
