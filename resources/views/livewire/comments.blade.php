@@ -59,10 +59,16 @@
 <script>
     window.livewire.on('fileChoosen', () => {
         let inputField = document.getElementById('image')
+        console.log('testing fileChosen');
+        console.log(inputField);
         let file = inputField.files[0]
+        console.log(file);
         let reader = new FileReader();
+
         reader.onloadend = () => {
+            console.log("on load end event start");
             window.livewire.emit('fileUpload', reader.result)
+            console.log("on load end event end");
         }
         reader.readAsDataURL(file);
     })

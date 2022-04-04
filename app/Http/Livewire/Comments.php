@@ -17,6 +17,10 @@ class Comments extends Component
     public $image = "";
     public $ticketId;
     
+    protected $listeners = [
+        'fileUpload'     => 'handleFileUpload',
+        'ticketSelected',
+    ];
     
     public function ticketSelected($ticketId)
     {
@@ -36,7 +40,7 @@ class Comments extends Component
     public function addComment()
     {
         $this->validate(['newComment' => 'required|max:255']);
-        $image = "";
+        $image  = $this->storeImage();
 
         $createdComment = Comment::create([
             'body'              => $this->newComment, 
