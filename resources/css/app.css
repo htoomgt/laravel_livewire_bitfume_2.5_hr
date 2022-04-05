@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.main{    
+    margin: auto;
+    width: 1000px;
+    min-height: 200px;    
+    padding:16px;
+}
